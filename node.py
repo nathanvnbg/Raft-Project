@@ -75,22 +75,27 @@ class RaftNode(object):
         return 1
 
 
+    def readIp(self):
+        with open('address', 'r') as f:
+           self.id = f.read().strip()
+
+
     def writeLog(self):
-        with open('raftlog'+self.id, 'w') as f:
+        with open('raftlog', 'w') as f:
            pickle.dump(self.log, f)
 
     def readLog(self):
-        with open('raftlog'+self.id, 'r') as f:
+        with open('raftlog', 'r') as f:
            self.log = pickle.load(f)
            self.numLog = len(self.log)
 
 
     def writePersistent(self):
-        with open('persistent'+self.id, 'w') as f:
+        with open('persistent', 'w') as f:
            pickle.dump([self.currentTerm, self.votedFor], f)
 
     def readPersistent(self):
-        with open('persistent'+self.id, 'r') as f:
+        with open('persistent', 'r') as f:
            line = pickle.load(f)
            self.currentTerm = line[0]
            self.votedFor = line[1]
@@ -359,20 +364,24 @@ def main(argv):
     #print argv
 
     node = RaftNode()
-    node.id = argv[0]
 
-    nodeIds = ["8000", "8001", "8002", "8003", "8004"]
+    node.readIp()
+    print "Id:"
+    print node.id
+
+    nodeIds = ["10.2.0.242", "10.3.0.237", "10.6.1.9", "10.7.0.251", "10.10.0.51"]
     nodeIds.remove(node.id)
+    print nodeIds
 
     #print node.id
     #print nodeIds
 
-    server = SimpleXMLRPCServer.SimpleXMLRPCServer(("", int(node.id)), allow_none=True)
+    server = SimpleXMLRPCServer.SimpleXMLRPCServer(("", 8000), allow_none=True)
     server.register_instance(node)
 
 
     for nodeId in nodeIds:
-        n = xmlrpclib.Server("http://localhost:"+nodeId, allow_none=True)
+        n = xmlrpclib.Server("http://"+nodeId+":8000", allow_none=True)
         node.nodes.append(n)
     
     print("Raft node ready.")

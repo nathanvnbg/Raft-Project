@@ -29,15 +29,17 @@ def addEntry(nodes, tid, data):
 
 
 def main():
-    tid = 0
+    tid = 0    # unique transaction id
     nodes = []
-    nodeIds = ["8000", "8001", "8002", "8003", "8004"]
+    nodeIds = ["10.2.0.242", "10.3.0.237", "10.6.1.9", "10.7.0.251", "10.10.0.51"]
 
     for nodeId in nodeIds:
-        node = xmlrpclib.Server("http://localhost:"+nodeId, allow_none=True)
+        node = xmlrpclib.Server("http://"+nodeId+":8000", allow_none=True)
         nodes.append(node)
 
     addEntry(nodes, tid, "test")
+    #tid += 1
+    #addEntry(nodes, tid, "abcd")
 
     print 'Client Done'
 
